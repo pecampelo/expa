@@ -1,23 +1,22 @@
+type Route = {
+	endpoint: string,
+	method: string,
+	handler?: () => unknown;
+}
 
-
+type RouteController = {
+	index?: () => {};
+	show?: () => {};
+	create?:  () => {};
+	update?:  () => {};
+	delete?:  () => {};
+}
 class Controller {
-  
-  label: string;
-  endpoint: string;
-  methods: string;
-  childController: ChildController;
-  main: boolean = false;
-  id: string;
-  name: string;
-  routes: Route[];
-  instances: Controller;
-  static instances: any;
-  
-	constructor(label, methods, endpoint, ChildController, main) {
-
-    this.label = label;
-
-
+	
+	static instances: Controller[];
+	
+	constructor(label: string, methods: string, endpoint: string, routeController: RouteController, main: boolean) {
+		this.label = label;
 		let string = '';
 		if (typeof methods === 'string' && methods.length < 5 && methods.length > 0) {
 			const methodArray = methods.split('');
@@ -30,61 +29,70 @@ class Controller {
 		} else {
 			methods === undefined;
 		}
-
+		
 		this.methods = string;
-
-
+		
+		
 		this.endpoint = endpoint;
-
-		this.childController = new ChildController();
-
+		
+		this.routeController = routeController;
+		
 		this.id = '/:id';
-
+		
 		this.name = '/:name';
-
+		
 		if (main) {
 			this.id = '';
 			this.name = '';
 		}
-
+		
 		this.routes = [
 			{
 				'endpoint': `${this.endpoint}`,
 				'method': 'GET',
-				'handler': this.childController.index,
+				'handler': this.routeController.index,
 			},
 			{
 				'endpoint': `${this.endpoint}${this.id}`,
 				'method': 'GET',
-				'handler': this.childController.show,
+				'handler': this.routeController.show,
 			},
 			{
 				'endpoint': `${this.endpoint}${this.name}`,
 				'method': 'GET',
-				'handler': this.childController.show,
+				'handler': this.routeController.show,
 			},
 			{
 				'endpoint': `${this.endpoint}`,
 				'method': 'POST',
-				'handler': this.childController.create,
+				'handler': this.routeController.create,
 			},
 			{
 				'endpoint': `${this.endpoint}${this.id}`,
 				'method': 'PUT',
-				'handler': this.childController.update,
+				'handler': this.routeController.update,
 			},
 			{
 				'endpoint': `${this.endpoint}${this.id}`,
 				'method': 'DELETE',
-				'handler': this.childController.delete,
+				'handler': this.routeController.delete,
 			},
 		];
-
+		
 		delete this.id;
 		delete this.name;
-
+		
     Controller.instances.push(this);   
 	}
+	
+	label: string;
+	endpoint: string;
+	methods: string;
+	routeController: RouteController;
+	main: boolean = false;
+	id?: string;
+	name?: string;
+	routes: Route[];
 }
 
 export default Controller;
